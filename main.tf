@@ -18,3 +18,17 @@ module "kms" {
   key_administrators = var.key_administrators
   aliases            = var.aliases
 }
+
+# IAMユーザーを作成するためのモジュール
+# 指定した名前でユーザーを作成し、指定したポリシーをアタッチ
+module "iam_user" {
+  source = "./modules/iam"
+
+  user_name               = var.iam_user_name
+  create_access_key       = var.create_access_key
+  create_login_profile    = var.create_login_profile
+  password_reset_required = var.password_reset_required
+  force_destroy           = var.force_destroy
+  policy_arns             = var.iam_policy_arns
+}
+
