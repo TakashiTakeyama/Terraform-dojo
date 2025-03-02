@@ -92,6 +92,47 @@ variable "iam_policy_arns" {
   type        = list(string)
 }
 
+#####################################################################################
+# S3
+#####################################################################################
 
+variable "s3_bucket_name" {
+  description = "S3バケットの名前"
+  type        = string
+}
 
+variable "s3_acl" {
+  description = "バケットのアクセスコントロールリスト"
+  type        = string
+  default     = "private"
+}
 
+variable "s3_force_destroy" {
+  description = "バケットを強制的に削除するかどうか"
+  type        = bool
+  default     = false
+}
+
+variable "s3_versioning_enabled" {
+  description = "バージョニングを有効にするかどうか"
+  type        = bool
+  default     = false
+}
+
+variable "s3_sse_enabled" {
+  description = "サーバーサイド暗号化を有効にするかどうか"
+  type        = bool
+  default     = true
+}
+
+variable "s3_kms_key_id" {
+  description = "暗号化に使用するKMSキーのID"
+  type        = string
+  default     = null
+}
+
+variable "s3_lifecycle_rules" {
+  description = "ライフサイクルルールの設定"
+  type        = any
+  default     = []
+}
