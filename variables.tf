@@ -136,3 +136,28 @@ variable "s3_lifecycle_rules" {
   type        = any
   default     = []
 }
+
+#####################################################################################
+# ECR
+#####################################################################################
+
+variable "dev_repos" {
+  description = "開発環境のECRリポジトリ設定"
+  type = map(object({
+    repo_names         = list(string)
+    repo_access_arns   = list(string)
+    lambda_access_arns = list(string)
+  }))
+  default = {}
+}
+
+variable "ga_role_names" {
+  description = "GitHub Actions用のIAMロール名のリスト"
+  type        = list(string)
+  default     = []
+}
+
+variable "github_oidc_provider_arn" {
+  description = "GitHub OIDC プロバイダーのARN"
+  type        = string
+}

@@ -4,8 +4,8 @@ module "s3_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "~> 3.0"
 
-  bucket        = var.bucket_name                  # バケット名
-  force_destroy = var.force_destroy               # 強制削除の有無
+  bucket        = var.bucket_name   # バケット名
+  force_destroy = var.force_destroy # 強制削除の有無
 
   # ACLを無効化（現代的アプローチ）
   control_object_ownership = true
@@ -33,7 +33,7 @@ module "s3_bucket" {
         sse_algorithm     = "aws:kms"
         kms_master_key_id = var.kms_key_id
       }
-      bucket_key_enabled = true  # S3 Bucket Keyを有効化してコスト削減
+      bucket_key_enabled = true # S3 Bucket Keyを有効化してコスト削減
     }
   }
 
@@ -77,7 +77,7 @@ module "s3_bucket" {
 resource "aws_s3_access_point" "example" {
   name   = "example-access-point"
   bucket = module.s3_bucket.s3_bucket_id
-  
+
   # アクセスポイント用のポリシー
   policy = jsonencode({
     // ポリシー内容

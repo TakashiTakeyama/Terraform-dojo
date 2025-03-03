@@ -45,3 +45,15 @@ module "s3" {
   kms_key_id         = var.s3_kms_key_id != null ? var.s3_kms_key_id : module.kms.kms_key_arn # 暗号化に使用するKMSキーのID（指定がない場合は作成したKMSキーを使用）
   lifecycle_rules    = var.s3_lifecycle_rules                                                 # オブジェクトのライフサイクルルール設定
 }
+
+# ECRリポジトリを作成・管理するためのモジュール
+# 開発環境用のリポジトリとアクセス権限を設定
+module "ecr" {
+  source = "./modules/ecr"
+
+  dev_repos                = var.dev_repos                # ECRリポジトリの設定
+  ga_role_names            = var.ga_role_names            # GitHub Actions用ロール名
+  github_oidc_provider_arn = var.github_oidc_provider_arn # GitHub OIDC プロバイダーのARN
+}
+
+
