@@ -56,4 +56,14 @@ module "ecr" {
   github_oidc_provider_arn = var.github_oidc_provider_arn # GitHub OIDC プロバイダーのARN
 }
 
+# VPCを作成するためのモジュール
+# VPCの作成、サブネットの設定、Flow Logsの設定を行う
+# - パブリック/プライベートサブネットを各AZに作成
+# - NATゲートウェイを有効化(シングル構成)
+# - VPC Flow LogsをS3またはCloudWatch Logsに出力
+module "vpc" {
+  source = "./modules/vpc"
 
+  vpc_name           = var.vpc_name           # VPCの名前
+  destination_s3_arn = var.destination_s3_arn # Flow Logs出力先のS3バケットARN(nullの場合はCloudWatch Logs)
+}
