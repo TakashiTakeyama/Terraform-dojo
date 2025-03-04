@@ -67,3 +67,15 @@ module "vpc" {
   vpc_name           = var.vpc_name           # VPCの名前
   destination_s3_arn = var.destination_s3_arn # Flow Logs出力先のS3バケットARN(nullの場合はCloudWatch Logs)
 }
+
+# コンテナイメージを使用してLambda関数をデプロイするためのモジュール
+# - function_name: Lambda関数の名前を指定
+# - description: Lambda関数の説明文を設定 
+# - image_uri: デプロイするコンテナイメージのURIを指定
+module "lambda_function_container_image" {
+  source = "./modules/lambda/container-iamge"
+
+  function_name = var.function_name
+  description   = var.description
+  image_uri     = var.image_uri
+}
