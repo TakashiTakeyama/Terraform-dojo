@@ -195,3 +195,22 @@ variable "image_uri" {
   description = "Lambda関数のイメージURI"
   type        = string
 }
+
+#####################################################################################
+# CloudFront
+#####################################################################################
+
+variable "cloudfront" {
+  description = "CloudFrontの設定"
+  type = object({
+    aliases                                = list(string)
+    comment                                = optional(string, "Managed by Terraform")
+    enabled                                = optional(bool, true)
+    is_ipv6_enabled                        = optional(bool, true)
+    price_class                            = optional(string, "PriceClass_100")
+    origin_access_identities               = optional(string, "CloudFront OAI")
+    logging_config_bucket                  = string
+    s3_origin_config_domain_name           = string
+    viewer_certificate_acm_certificate_arn = string
+  })
+}

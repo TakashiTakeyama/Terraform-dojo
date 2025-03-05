@@ -79,3 +79,28 @@ module "lambda_function_container_image" {
   description   = var.description
   image_uri     = var.image_uri
 }
+
+# CloudFrontディストリビューションを作成するためのモジュール
+# CloudFrontディストリビューションを作成するためのモジュール
+# - aliases: カスタムドメインを設定（example.com等）
+# - comment: ディストリビューションの説明文
+# - enabled: ディストリビューションの有効/無効を制御
+# - is_ipv6_enabled: IPv6サポートの有効/無効を設定
+# - price_class: 使用するエッジロケーションの範囲を指定（PriceClass_100等）
+# - origin_access_identities: S3バケットアクセス用のOAIを設定
+# - logging_config_bucket: アクセスログを保存するS3バケットを指定
+# - s3_origin_config_domain_name: オリジンとなるS3バケットのドメイン名
+# - viewer_certificate_acm_certificate_arn: HTTPS通信用のACM証明書ARN
+module "cloudfront" {
+  source = "./modules/cloudfront"
+
+  aliases                                = var.cloudfront.aliases
+  comment                                = var.cloudfront.comment
+  enabled                                = var.cloudfront.enabled
+  is_ipv6_enabled                        = var.cloudfront.is_ipv6_enabled
+  price_class                            = var.cloudfront.price_class
+  origin_access_identities               = var.cloudfront.origin_access_identities
+  logging_config_bucket                  = var.cloudfront.logging_config_bucket
+  s3_origin_config_domain_name           = var.cloudfront.s3_origin_config_domain_name
+  viewer_certificate_acm_certificate_arn = var.cloudfront.viewer_certificate_acm_certificate_arn
+}
