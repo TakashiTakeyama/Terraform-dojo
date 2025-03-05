@@ -1,5 +1,8 @@
+#####################################################################################
+# SSM EC2
+#####################################################################################
+
 # SSM経由でEC2インスタンスを管理するためのモジュール
-# VPC、WorkSpaces、SSM、ユーザーデータ、AMIの設定を行う
 module "ssm_ec2" {
   source = "./modules/ssm-ec2"
 
@@ -10,8 +13,11 @@ module "ssm_ec2" {
   ami_name        = var.ami_name        # 使用するAMIの名前
 }
 
+#####################################################################################
+# KMS
+#####################################################################################
+
 # KMSキーを作成・管理するためのモジュール
-# 指定したIAMユーザーに管理者権限を付与し、エイリアスを設定
 module "kms" {
   source = "./modules/kms"
 
@@ -19,8 +25,11 @@ module "kms" {
   aliases            = var.aliases            # KMSキーに設定するエイリアスのリスト
 }
 
+#####################################################################################
+# IAM
+#####################################################################################
+
 # IAMユーザーを作成するためのモジュール
-# 指定した名前でユーザーを作成し、指定したポリシーをアタッチ
 module "iam_user" {
   source = "./modules/iam"
 
@@ -32,22 +41,28 @@ module "iam_user" {
   policy_arns             = var.iam_policy_arns         # ユーザーにアタッチするIAMポリシーのARNのリスト
 }
 
+#####################################################################################
+# S3
+#####################################################################################
+
 # S3バケットを作成するためのモジュール
-# バケット名、アクセス制御、暗号化、ライフサイクルルールを設定
 module "s3" {
   source = "./modules/s3"
 
   bucket_name        = var.s3_bucket_name                                                     # 作成するS3バケットの名前
-  acl                = var.s3_acl                                                             # バケットのアクセスコントロールリスト（private, public-read等）
+  acl                = var.s3_acl                                                             # バケットのアクセスコントロールリスト
   force_destroy      = var.s3_force_destroy                                                   # バケットを強制的に削除できるようにするかどうか
   versioning_enabled = var.s3_versioning_enabled                                              # バージョニングを有効にするかどうか
   sse_enabled        = var.s3_sse_enabled                                                     # サーバーサイド暗号化を有効にするかどうか
-  kms_key_id         = var.s3_kms_key_id != null ? var.s3_kms_key_id : module.kms.kms_key_arn # 暗号化に使用するKMSキーのID（指定がない場合は作成したKMSキーを使用）
+  kms_key_id         = var.s3_kms_key_id != null ? var.s3_kms_key_id : module.kms.kms_key_arn # 暗号化に使用するKMSキーのID
   lifecycle_rules    = var.s3_lifecycle_rules                                                 # オブジェクトのライフサイクルルール設定
 }
 
+#####################################################################################
+# ECR
+#####################################################################################
+
 # ECRリポジトリを作成・管理するためのモジュール
-# 開発環境用のリポジトリとアクセス権限を設定
 module "ecr" {
   source = "./modules/ecr"
 
@@ -56,51 +71,46 @@ module "ecr" {
   github_oidc_provider_arn = var.github_oidc_provider_arn # GitHub OIDC プロバイダーのARN
 }
 
+#####################################################################################
+# VPC
+#####################################################################################
+
 # VPCを作成するためのモジュール
-# VPCの作成、サブネットの設定、Flow Logsの設定を行う
-# - パブリック/プライベートサブネットを各AZに作成
-# - NATゲートウェイを有効化(シングル構成)
-# - VPC Flow LogsをS3またはCloudWatch Logsに出力
 module "vpc" {
   source = "./modules/vpc"
 
   vpc_name           = var.vpc_name           # VPCの名前
-  destination_s3_arn = var.destination_s3_arn # Flow Logs出力先のS3バケットARN(nullの場合はCloudWatch Logs)
+  destination_s3_arn = var.destination_s3_arn # Flow Logs出力先のS3バケットARN
 }
 
+#####################################################################################
+# Lambda
+#####################################################################################
+
 # コンテナイメージを使用してLambda関数をデプロイするためのモジュール
-# - function_name: Lambda関数の名前を指定
-# - description: Lambda関数の説明文を設定 
-# - image_uri: デプロイするコンテナイメージのURIを指定
 module "lambda_function_container_image" {
   source = "./modules/lambda/container-iamge"
 
-  function_name = var.function_name
-  description   = var.description
-  image_uri     = var.image_uri
+  function_name = var.function_name # Lambda関数の名前
+  description   = var.description   # Lambda関数の説明文
+  image_uri     = var.image_uri     # デプロイするコンテナイメージのURI
 }
 
+#####################################################################################
+# CloudFront
+#####################################################################################
+
 # CloudFrontディストリビューションを作成するためのモジュール
-# CloudFrontディストリビューションを作成するためのモジュール
-# - aliases: カスタムドメインを設定（example.com等）
-# - comment: ディストリビューションの説明文
-# - enabled: ディストリビューションの有効/無効を制御
-# - is_ipv6_enabled: IPv6サポートの有効/無効を設定
-# - price_class: 使用するエッジロケーションの範囲を指定（PriceClass_100等）
-# - origin_access_identities: S3バケットアクセス用のOAIを設定
-# - logging_config_bucket: アクセスログを保存するS3バケットを指定
-# - s3_origin_config_domain_name: オリジンとなるS3バケットのドメイン名
-# - viewer_certificate_acm_certificate_arn: HTTPS通信用のACM証明書ARN
 module "cloudfront" {
   source = "./modules/cloudfront"
 
-  aliases                                = var.cloudfront.aliases
-  comment                                = var.cloudfront.comment
-  enabled                                = var.cloudfront.enabled
-  is_ipv6_enabled                        = var.cloudfront.is_ipv6_enabled
-  price_class                            = var.cloudfront.price_class
-  origin_access_identities               = var.cloudfront.origin_access_identities
-  logging_config_bucket                  = var.cloudfront.logging_config_bucket
-  s3_origin_config_domain_name           = var.cloudfront.s3_origin_config_domain_name
-  viewer_certificate_acm_certificate_arn = var.cloudfront.viewer_certificate_acm_certificate_arn
+  aliases                                = var.cloudfront.aliases                                # カスタムドメイン
+  comment                                = var.cloudfront.comment                                # ディストリビューションの説明文
+  enabled                                = var.cloudfront.enabled                                # ディストリビューションの有効/無効
+  is_ipv6_enabled                        = var.cloudfront.is_ipv6_enabled                        # IPv6サポートの有効/無効
+  price_class                            = var.cloudfront.price_class                            # エッジロケーションの範囲
+  origin_access_identities               = var.cloudfront.origin_access_identities               # S3バケットアクセス用のOAI
+  logging_config_bucket                  = var.cloudfront.logging_config_bucket                  # アクセスログ保存用S3バケット
+  s3_origin_config_domain_name           = var.cloudfront.s3_origin_config_domain_name           # オリジンS3バケットのドメイン名
+  viewer_certificate_acm_certificate_arn = var.cloudfront.viewer_certificate_acm_certificate_arn # HTTPS通信用ACM証明書ARN
 }
