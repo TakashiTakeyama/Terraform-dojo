@@ -38,3 +38,9 @@ variable "lifecycle_rules" {
   type        = any
   default     = []
 }
+
+variable "bucket_policy" {
+  description = "バケットポリシー"
+  type        = string
+  default     = ""
+}
