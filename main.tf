@@ -47,7 +47,7 @@ module "iam_user" {
 
 # S3バケットを作成するためのモジュール
 module "s3" {
-  source = "./modules/s3"
+  source = "./modules/s3/s3-bucket"
 
   bucket_name        = var.s3_bucket_name                                                     # 作成するS3バケットの名前
   acl                = var.s3_acl                                                             # バケットのアクセスコントロールリスト
