@@ -1,0 +1,137 @@
+# OpenAPI仕様書バージョン3.0.1
+openapi: 3.0.1
+info:
+  # APIのタイトル
+  title: REST API
+  # APIのバージョン
+  version: "1.0.0"
+  # APIの説明
+  description: A sample API to illustrate OpenAPI 3.0 YAML format.
+# APIサーバーの設定
+servers:
+  - url: https://api.example.com/v1
+# APIのパス（エンドポイント）定義
+paths:
+  # ユーザー一覧のエンドポイント
+  /users:
+    # GETメソッド - ユーザー一覧取得
+    get:
+      summary: Retrieve a list of users
+      description: Returns an array of user objects.
+      responses:
+        # 成功時のレスポンス
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    # POSTメソッド - 新規ユーザー作成
+    post:
+      summary: Create a new user
+      description: Creates a new user in the system.
+      # リクエストボディの定義
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        # ユーザー作成成功時のレスポンス
+        '201':
+          description: User created successfully
+  # 特定ユーザーのエンドポイント
+  /users/{userId}:
+    # GETメソッド - 特定ユーザー取得
+    get:
+      summary: Retrieve a single user
+      description: Returns a single user by their ID.
+      # パスパラメータの定義
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        # 成功時のレスポンス
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        # ユーザーが見つからない場合のレスポンス
+        '404':
+          description: User not found
+    # PUTメソッド - ユーザー情報更新
+    put:
+      summary: Update an existing user
+      description: Updates a user by their ID.
+      # パスパラメータの定義
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      # リクエストボディの定義
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        # 更新成功時のレスポンス
+        '200':
+          description: User updated successfully
+        # ユーザーが見つからない場合のレスポンス
+        '404':
+          description: User not found
+    # DELETEメソッド - ユーザー削除
+    delete:
+      summary: Delete a user
+      description: Deletes a user by their ID.
+      # パスパラメータの定義
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        # 削除成功時のレスポンス
+        '204':
+          description: User deleted successfully
+        # ユーザーが見つからない場合のレスポンス
+        '404':
+          description: User not found
+# コンポーネント定義
+components:
+  # スキーマ定義
+  schemas:
+    # ユーザーモデルの定義
+    User:
+      type: object
+      # 必須フィールド
+      required:
+        - id
+        - name
+      # プロパティ定義
+      properties:
+        # ユーザーID
+        id:
+          type: string
+          example: "12345"
+        # ユーザー名
+        name:
+          type: string
+          example: "John Doe"
+        # メールアドレス
+        email:
+          type: string
+          example: "john.doe@example.com"
