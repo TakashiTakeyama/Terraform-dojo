@@ -1,0 +1,34 @@
+# OpenAPI仕様書バージョン2.0
+---
+swagger: "2.0"                   # Swaggerのバージョン
+info:
+  description: "${description}"  # APIの説明（変数から取得）
+  version: "1.0.0"               # APIのバージョン
+  title: "${title}"              # APIのタイトル（変数から取得）
+basePath: "/${stage_name}"       # APIのベースパス（ステージ名から構成）
+schemes:
+- "https"                        # 使用するプロトコル（HTTPSのみ）
+paths:
+  /${resource_path}:             # リソースパス（変数から取得）
+    post:                        # POSTメソッド定義
+      produces:
+      - "application/json"       # レスポンス形式はJSON
+      responses:
+        "200":                   # 成功時のレスポンス
+          description: "200 response"
+      security:
+      - api_key: []              # APIキー認証を使用
+      x-amazon-apigateway-integration:  # API Gateway固有の統合設定
+        httpMethod: "${http_method}"    # 使用するHTTPメソッド
+        uri: "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${lambda_function_arn}/invocations"  # Lambda関数の呼び出しURI
+        responses:
+          default:
+            statusCode: "200"    # デフォルトのステータスコード
+        passthroughBehavior: "when_no_match"  # マッピングテンプレートが一致しない場合の動作
+        contentHandling: "CONVERT_TO_TEXT"    # コンテンツ変換方法
+        type: "aws"              # 統合タイプ（AWS）
+securityDefinitions:
+  api_key:                       # セキュリティ定義（APIキー）
+    type: "apiKey"               # 認証タイプ
+    name: "x-api-key"            # APIキーのヘッダー名
+    in: "header"                 # APIキーの場所（HTTPヘッダー）
