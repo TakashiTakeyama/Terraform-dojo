@@ -3,25 +3,24 @@
 # REST APIを作成し、Swaggerファイルを使用して設定します
 # ----------------------------------------------
 
-# 現在のAWSリージョンを取得
-data "aws_region" "current" {}
-
 # REST API Gateway
 # 各APIごとにREST API Gatewayリソースを作成
 resource "aws_api_gateway_rest_api" "rest_api" {
   for_each    = var.apis
 
   # APIの名前とリソース説明を設定
-  name        = "${var.company_name}-${var.product_name}-${var.project_name}-${var.env}-${each.value.api_name}"
-  description = "Private REST API Gateway for ${var.product_name}-${var.project_name}-${var.env}-${each.value.api_name}"
+  name        = each.value.name
+  description = "Private REST API Gateway for ${each.value.description}"
 
   # Swaggerテンプレートを使用してAPIを定義
   body = data.template_file.swagger[each.key].rendered
 
   # エンドポイント設定（プライベートVPCエンドポイント）
   endpoint_configuration {
-    types = ["${var.api_type}"]
-    vpc_endpoint_ids = [var.api_gateway_endpoint_id]
+    # types = ["${var.api_type}"]
+    types = ["${each.value.api_type}"]
+    # vpc_endpoint_ids = [var.api_gateway_endpoint_id]
+    vpc_endpoint_ids = [each.value.api_gateway_endpoint_id]
   }
 
   # APIのリソースポリシー設定
@@ -48,28 +47,6 @@ resource "aws_api_gateway_rest_api" "rest_api" {
     }
   ]
   })
-
-  # リソースタグ
-  tags = {
-    Environment = "${var.env}"
-  }
-}
-
-# Swaggerインポート
-# Swaggerテンプレートファイルを読み込み、変数を置換
-data "template_file" "swagger" {
-  for_each = var.apis
-
-  template = file("${path.module}/swagger.yaml")
-  vars = {
-    description         = "REST API Gateway for ${var.company_name}-${var.product_name}-${var.project_name}"
-    title               = "${var.company_name}-${var.product_name}-${var.project_name}-${var.env}-${each.value.api_name}"
-    stage_name          = "${each.value.api_stage_name}"
-    resource_path       = "${each.value.api_resource_path}"
-    http_method         = "${each.value.api_method}"
-    aws_region          = "${data.aws_region.current.name}"
-    lambda_function_arn = var.lambda_function_arns[each.value.lambda_name]
-  }
 }
 
 # API Gateway ログ Role 設定
@@ -119,10 +96,6 @@ resource "aws_api_gateway_stage" "api_stage" {
 
   # X-Rayトレース有効化
   xray_tracing_enabled = true
-
-  tags = {
-    Environment = "${var.env}"
-  }
 }
 
 # デプロイ
