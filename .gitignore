@@ -1,4 +1,30 @@
-.terraform
+# Terraform関連
+.terraform/
 *.tfstate
-*.tfstate.backup
+*.tfstate.*
 *.tfvars
+.terraformrc
+terraform.rc
+.terraform.lock.hcl
+crash.log
+
+# IDE/エディタ関連
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# 環境変数/シークレット
+.env
+.env.*
+*.pem
+*.key
+
+# ログファイル
+*.log
+crash.*.log
+
+# システム関連
+.DS_Store
+Thumbs.db
