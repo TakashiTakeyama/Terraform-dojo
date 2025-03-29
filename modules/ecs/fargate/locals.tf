@@ -10,7 +10,7 @@ locals {
 
   tags = {
     Name       = local.name
-    Example    = local.name
+    CostType   = local.name
     Repository = "https://github.com/terraform-aws-modules/terraform-aws-ecs"
   }
 }

@@ -59,7 +59,7 @@ variable "api_log_group_arns" {
 
 variable "lambda_function_arns" {
   description = "Lambda関数ARNのマップ"
-  type = map(string)
+  type        = map(string)
 }
 
 variable "usage_plan_throttle_burst_limit" {
@@ -89,7 +89,7 @@ variable "lambda_permission_action" {
 
 variable "lambda_function_names" {
   description = "Lambda関数名のマップ"
-  type = map(string)
+  type        = map(string)
 }
 
 variable "lambda_permission_principal" {

@@ -11,13 +11,13 @@ module "ecs_cluster" {
   fargate_capacity_providers = {
     FARGATE = {
       default_capacity_provider_strategy = {
-        weight = 50  # 通常Fargateの重み
-        base   = 20  # 最低限確保するタスク数
+        weight = 50 # 通常Fargateの重み
+        base   = 20 # 最低限確保するタスク数
       }
     }
     FARGATE_SPOT = {
       default_capacity_provider_strategy = {
-        weight = 50  # スポットインスタンスの重み
+        weight = 50 # スポットインスタンスの重み
       }
     }
   }
@@ -33,8 +33,8 @@ module "ecs_service" {
   name        = local.name
   cluster_arn = module.ecs_cluster.arn
 
-  cpu    = 1024  # タスク全体のCPUユニット
-  memory = 4096  # タスク全体のメモリ（MiB）
+  cpu    = 1024 # タスク全体のCPUユニット
+  memory = 4096 # タスク全体のメモリ（MiB）
 
   # ECS Execを有効化 - コンテナ内でコマンド実行可能に
   enable_execute_command = true
@@ -46,26 +46,26 @@ module "ecs_service" {
     fluent-bit = {
       cpu       = 512
       memory    = 1024
-      essential = true  # このコンテナが必須
-      image     = nonsensitive(data.aws_ssm_parameter.fluentbit.value)  # SSMパラメータストアから最新イメージを取得
+      essential = true                                                 # このコンテナが必須
+      image     = nonsensitive(data.aws_ssm_parameter.fluentbit.value) # SSMパラメータストアから最新イメージを取得
       firelens_configuration = {
-        type = "fluentbit"  # FireLensタイプの指定
+        type = "fluentbit" # FireLensタイプの指定
       }
       memory_reservation = 50  # ソフト制限（MiB）
-      user               = "0"  # rootユーザーで実行
+      user               = "0" # rootユーザーで実行
     }
 
     # メインアプリケーションコンテナ
     (local.container_name) = {
       cpu       = 512
       memory    = 1024
-      essential = true  # このコンテナが必須
-      image     = "public.ecr.aws/aws-containers/ecsdemo-frontend:776fd50"  # コンテナイメージ
+      essential = true                                                     # このコンテナが必須
+      image     = "public.ecr.aws/aws-containers/ecsdemo-frontend:776fd50" # コンテナイメージ
       port_mappings = [
         {
           name          = local.container_name
-          containerPort = local.container_port  # コンテナ内部ポート
-          hostPort      = local.container_port  # ホスト側ポート
+          containerPort = local.container_port # コンテナ内部ポート
+          hostPort      = local.container_port # ホスト側ポート
           protocol      = "tcp"
         }
       ]
@@ -75,8 +75,8 @@ module "ecs_service" {
 
       # コンテナの依存関係
       dependencies = [{
-        containerName = "fluent-bit"  # 依存するコンテナ名
-        condition     = "START"       # 起動条件
+        containerName = "fluent-bit" # 依存するコンテナ名
+        condition     = "START"      # 起動条件
       }]
 
       # CloudWatchログ無効化（FireLensを使用するため）
@@ -85,19 +85,19 @@ module "ecs_service" {
       log_configuration = {
         logDriver = "awsfirelens"
         options = {
-          Name                    = "firehose"  # Firehoseへ送信
+          Name                    = "firehose" # Firehoseへ送信
           region                  = local.region
           delivery_stream         = "my-stream"
-          log-driver-buffer-limit = "2097152"   # バッファサイズ
+          log-driver-buffer-limit = "2097152" # バッファサイズ
         }
       }
 
       # Linuxセキュリティパラメータ
       linux_parameters = {
         capabilities = {
-          add = []  # 追加する権限なし
+          add = [] # 追加する権限なし
           drop = [
-            "NET_RAW"  # ネットワーク生パケット操作権限を削除
+            "NET_RAW" # ネットワーク生パケット操作権限を削除
           ]
         }
       }
@@ -108,7 +108,7 @@ module "ecs_service" {
         readOnly        = false
       }]
 
-      memory_reservation = 100  # ソフト制限（MiB）
+      memory_reservation = 100 # ソフト制限（MiB）
     }
   }
 
@@ -118,7 +118,7 @@ module "ecs_service" {
     service = {
       client_alias = {
         port     = local.container_port
-        dns_name = local.container_name  # サービス名
+        dns_name = local.container_name # サービス名
       }
       port_name      = local.container_name
       discovery_name = local.container_name
@@ -135,7 +135,7 @@ module "ecs_service" {
   }
 
   # ネットワーク設定
-  subnet_ids = module.vpc.private_subnets  # プライベートサブネットに配置
+  subnet_ids = module.vpc.private_subnets # プライベートサブネットに配置
   # セキュリティグループルール
   security_group_rules = {
     alb_ingress_3000 = {
@@ -144,14 +144,14 @@ module "ecs_service" {
       to_port                  = local.container_port
       protocol                 = "tcp"
       description              = "Service port"
-      source_security_group_id = module.alb.security_group_id  # ALBからの通信のみ許可
+      source_security_group_id = module.alb.security_group_id # ALBからの通信のみ許可
     }
     egress_all = {
       type        = "egress"
       from_port   = 0
       to_port     = 0
-      protocol    = "-1"  # すべてのプロトコル
-      cidr_blocks = ["0.0.0.0/0"]  # すべての送信先を許可
+      protocol    = "-1"          # すべてのプロトコル
+      cidr_blocks = ["0.0.0.0/0"] # すべての送信先を許可
     }
   }
 
@@ -174,25 +174,25 @@ module "ecs_task_definition" {
 
   # タスク定義
   volume = {
-    ex-vol = {}  # 空のボリューム定義
+    ex-vol = {} # 空のボリューム定義
   }
 
   # ランタイムプラットフォーム設定
   runtime_platform = {
-    cpu_architecture        = "ARM64"  # ARMアーキテクチャ
+    cpu_architecture        = "ARM64" # ARMアーキテクチャ
     operating_system_family = "LINUX"
   }
 
   # コンテナ定義
   container_definitions = {
     al2023 = {
-      image = "public.ecr.aws/amazonlinux/amazonlinux:2023-minimal"  # Amazon Linux 2023
+      image = "public.ecr.aws/amazonlinux/amazonlinux:2023-minimal" # Amazon Linux 2023
 
       # ボリュームマウント設定
       mount_points = [
         {
           sourceVolume  = "ex-vol",
-          containerPath = "/var/www/ex-vol"  # コンテナ内マウントパス
+          containerPath = "/var/www/ex-vol" # コンテナ内マウントパス
         }
       ]
 
@@ -211,8 +211,8 @@ module "ecs_task_definition" {
       type        = "egress"
       from_port   = 0
       to_port     = 0
-      protocol    = "-1"  # すべてのプロトコル
-      cidr_blocks = ["0.0.0.0/0"]  # すべての送信先を許可
+      protocol    = "-1"          # すべてのプロトコル
+      cidr_blocks = ["0.0.0.0/0"] # すべての送信先を許可
     }
   }
 
@@ -244,7 +244,7 @@ module "alb" {
   load_balancer_type = "application"
 
   vpc_id  = module.vpc.vpc_id
-  subnets = module.vpc.public_subnets  # パブリックサブネットに配置
+  subnets = module.vpc.public_subnets # パブリックサブネットに配置
 
   # 本番環境では有効化すべき
   enable_deletion_protection = false
@@ -255,14 +255,14 @@ module "alb" {
       from_port   = 80
       to_port     = 80
       ip_protocol = "tcp"
-      cidr_ipv4   = "0.0.0.0/0"  # インターネットからのHTTPアクセスを許可
+      cidr_ipv4   = "0.0.0.0/0" # インターネットからのHTTPアクセスを許可
     }
   }
   # セキュリティグループ - アウトバウンドルール
   security_group_egress_rules = {
     all = {
-      ip_protocol = "-1"  # すべてのプロトコル
-      cidr_ipv4   = module.vpc.vpc_cidr_block  # VPC内部への通信のみ許可
+      ip_protocol = "-1"                      # すべてのプロトコル
+      cidr_ipv4   = module.vpc.vpc_cidr_block # VPC内部への通信のみ許可
     }
   }
 
@@ -273,7 +273,7 @@ module "alb" {
       protocol = "HTTP"
 
       forward = {
-        target_group_key = "ex_ecs"  # 転送先ターゲットグループ
+        target_group_key = "ex_ecs" # 転送先ターゲットグループ
       }
     }
   }
@@ -283,21 +283,21 @@ module "alb" {
     ex_ecs = {
       backend_protocol                  = "HTTP"
       backend_port                      = local.container_port
-      target_type                       = "ip"  # IPアドレスベースのターゲット
-      deregistration_delay              = 5     # 登録解除遅延（秒）
-      load_balancing_cross_zone_enabled = true  # クロスゾーンロードバランシング有効化
+      target_type                       = "ip" # IPアドレスベースのターゲット
+      deregistration_delay              = 5    # 登録解除遅延（秒）
+      load_balancing_cross_zone_enabled = true # クロスゾーンロードバランシング有効化
 
       # ヘルスチェック設定
       health_check = {
         enabled             = true
-        healthy_threshold   = 5      # 正常判定しきい値
-        interval            = 30     # チェック間隔（秒）
-        matcher             = "200"  # 成功レスポンスコード
-        path                = "/"    # チェックパス
+        healthy_threshold   = 5     # 正常判定しきい値
+        interval            = 30    # チェック間隔（秒）
+        matcher             = "200" # 成功レスポンスコード
+        path                = "/"   # チェックパス
         port                = "traffic-port"
         protocol            = "HTTP"
-        timeout             = 5      # タイムアウト（秒）
-        unhealthy_threshold = 2      # 異常判定しきい値
+        timeout             = 5 # タイムアウト（秒）
+        unhealthy_threshold = 2 # 異常判定しきい値
       }
 
       # ECSサービスがタスクIPを自動アタッチするため手動アタッチは不要
