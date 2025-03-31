@@ -1,11 +1,6 @@
 ################################################################################
 # GitHub OIDC Provider
 # GitHub Actionsが発行するOIDCトークンを使用して、AWSリソースへのアクセスが可能になる
-# このTerraformコード全体では、GitHub ActionsがAWSリソースにアクセスする際の認証とアクセス制御を、GitHub OIDCを利用してセキュアに実現しています。
-# プロバイダー: GitHubのOIDCプロバイダーを設定し、GitHub Actionsの発行するトークンをAWSが信頼する仕組みを作ります。
-# ロール: GitHub Actionsが引き受けるためのIAMロールを作成し、対象のアクションやユーザーを限定するための条件を追加しています。
-# ポリシー: ロールに必要な権限（ここではEC2の読み取りとS3の読み取り専用）をアタッチし、必要なアクセスを実現しています。
-# この設定により、GitHub Actionsから安全かつ柔軟にAWSリソースへアクセスするための仕組みが確立され、運用のセキュリティが大幅に向上します。
 ################################################################################
 
 module "iam_github_oidc_provider" {
@@ -34,14 +29,7 @@ module "iam_github_oidc_role" {
     "terraform-aws-modules/terraform-aws-iam:ref:refs/heads/master",
   ]
 
-  # GitHubのOpenID Connectによるセキュリティ強化のドキュメントに従って
-  # (https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect)
-  # このドキュメントでは、クラウドプロバイダーの信頼関係を設定する際に利用可能なOIDCクレームを
-  # 活用できることが多く言及されています。例えば、
-  # https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#customizing-the-token-claims
-  # では、追加のOIDCトークンクレームを使用して詳細なOIDCポリシーを定義できると指定されています。
-  # この例では、GitHubがAWS IAMロールを引き受けるために使用するOIDCトークンに正しい
-  # 「actor」スコープがあることを確認します。
+  # 「actor」スコープがあることを確認します 信頼ポリシー
   additional_trust_policy_conditions = [
     {
       test     = "StringEquals"
