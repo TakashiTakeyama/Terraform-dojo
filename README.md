@@ -28,6 +28,7 @@ terraform-dojo/
 │   ├── s3/           # S3バケット用モジュール
 │   ├── ssm-ec2/      # SSM経由でのEC2管理用モジュール
 │   ├── test/         # テスト用モジュール
+│   ├── tgw/          # Transit Gateway用モジュール
 │   └── vpc/          # VPC設定用モジュール
 ├── .terraform.lock.hcl # Terraformロックファイル
 └── .gitignore        # Gitの除外ファイル設定
@@ -48,4 +49,5 @@ terraform-dojo/
 - **s3**: S3 バケットを作成するためのモジュール
 - **ssm-ec2**: SSM 経由で EC2 インスタンスを管理するためのモジュール
 - **test**: テスト目的のモジュール
+- **tgw**: Transit Gateway と VPC 接続用のモジュール
 - **vpc**: VPC を作成するためのモジュール
