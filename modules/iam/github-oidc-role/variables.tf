@@ -1,4 +1,4 @@
 variable "name" {
-  description = "The name of the IAM role"
+  description = "IAMロールの名前"
   type        = string
 }

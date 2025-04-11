@@ -1,10 +1,10 @@
 module "tfstate_bucket" {
   source = "../basic" # 基本的なS3バケット設定を含むモジュールを使用
 
-  bucket_name        = "tfstate-management-bucket" # tfstate管理用のS3バケット名
-  force_destroy      = true                        # バケットの強制削除を許可
-  versioning_enabled = true                        # バケットのバージョニングを有効化
-  sse_enabled        = true                        # サーバーサイド暗号化を有効化
+  bucket_name        = var.bucket_name # tfstate管理用のS3バケット名
+  force_destroy      = false           # バケットの強制削除を許可
+  versioning_enabled = true            # バケットのバージョニングを有効化
+  sse_enabled        = true            # サーバーサイド暗号化を有効化
 
   bucket_policy = jsonencode({ # HTTPSアクセスのみを許可するバケットポリシー
     Version = "2012-10-17"
