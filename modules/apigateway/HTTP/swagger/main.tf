@@ -1,10 +1,9 @@
 # ----------------------------------------------
 # AWS API Gateway Swaggerモジュール
-# REST APIを作成し、Swaggerファイルを使用して設定します
+# Swaggerファイルを使用してREST APIを作成する
 # ----------------------------------------------
 
 # REST API Gateway
-# 各APIごとにREST API Gatewayリソースを作成
 resource "aws_api_gateway_rest_api" "rest_api" {
   for_each = var.apis
 
@@ -49,14 +48,12 @@ resource "aws_api_gateway_rest_api" "rest_api" {
   })
 }
 
-# API Gateway ログ Role 設定
 # CloudWatchログ用のIAMロールを設定
 resource "aws_api_gateway_account" "api_account" {
   cloudwatch_role_arn = var.apigateway_log_role_arn
 }
 
 # CloudWatchロググループの作成
-# 各APIのログを保存するためのロググループ
 resource "aws_cloudwatch_log_group" "api_log_group" {
   for_each = var.apis
 
@@ -68,7 +65,6 @@ resource "aws_cloudwatch_log_group" "api_log_group" {
   }
 }
 
-# ステージ
 # APIのデプロイ先となるステージを作成
 resource "aws_api_gateway_stage" "api_stage" {
   for_each = var.apis
@@ -94,12 +90,11 @@ resource "aws_api_gateway_stage" "api_stage" {
     })
   }
 
-  # X-Rayトレース有効化
-  xray_tracing_enabled = true
+  # X-Rayトレース無効化
+  xray_tracing_enabled = false
 }
 
 # デプロイ
-# APIの変更をデプロイするためのリソース
 resource "aws_api_gateway_deployment" "api_deployment" {
   for_each = var.apis
 
@@ -121,7 +116,6 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   }
 }
 
-# API キー
 # APIへのアクセスに必要なAPIキーを作成
 resource "aws_api_gateway_api_key" "api_key" {
   for_each = var.apis
@@ -133,7 +127,6 @@ resource "aws_api_gateway_api_key" "api_key" {
   }
 }
 
-# 使用プラン
 # APIの使用量制限を設定するプラン
 resource "aws_api_gateway_usage_plan" "usage_plan" {
   depends_on = [
@@ -173,7 +166,6 @@ resource "aws_api_gateway_usage_plan" "usage_plan" {
   }
 }
 
-# API キー　使用プランの関連付け
 # 作成したAPIキーを使用プランに関連付け
 resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
   for_each = var.apis
@@ -183,7 +175,7 @@ resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
   usage_plan_id = aws_api_gateway_usage_plan.usage_plan[each.key].id
 }
 
-# API をLambdaに関連付け
+# APIをLambdaに関連付け
 # Lambda関数がAPI Gatewayからの呼び出しを受け入れるための許可設定
 resource "aws_lambda_permission" "api_gateway" {
   for_each = var.apis
@@ -195,7 +187,6 @@ resource "aws_lambda_permission" "api_gateway" {
   source_arn    = "${aws_api_gateway_rest_api.rest_api[each.key].execution_arn}/*/*"
 }
 
-# API Gateway メソッド設定 CloudWatch ログ On
 # APIメソッドのログ記録と制限設定
 resource "aws_api_gateway_method_settings" "api_method_settings" {
   for_each = var.apis
