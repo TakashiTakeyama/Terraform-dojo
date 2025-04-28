@@ -29,17 +29,17 @@ module "kms" {
 # IAM
 #####################################################################################
 
-# IAMユーザーを作成するためのモジュール
-module "iam_user" {
-  source = "./modules/iam"
+# # IAMユーザーを作成するためのモジュール
+# module "iam_user" {
+#   source = "./modules/iam"
 
-  user_name               = var.iam_user_name           # 作成するIAMユーザーの名前
-  create_access_key       = var.create_access_key       # アクセスキーを作成するかどうか
-  create_login_profile    = var.create_login_profile    # コンソールログイン用のプロファイルを作成するかどうか
-  password_reset_required = var.password_reset_required # 初回ログイン時にパスワード変更を要求するかどうか
-  force_destroy           = var.force_destroy           # ユーザーを強制的に削除できるようにするかどうか
-  policy_arns             = var.iam_policy_arns         # ユーザーにアタッチするIAMポリシーのARNのリスト
-}
+#   user_name               = var.iam_user_name           # 作成するIAMユーザーの名前
+#   create_access_key       = var.create_access_key       # アクセスキーを作成するかどうか
+#   create_login_profile    = var.create_login_profile    # コンソールログイン用のプロファイルを作成するかどうか
+#   password_reset_required = var.password_reset_required # 初回ログイン時にパスワード変更を要求するかどうか
+#   force_destroy           = var.force_destroy           # ユーザーを強制的に削除できるようにするかどうか
+#   policy_arns             = var.iam_policy_arns         # ユーザーにアタッチするIAMポリシーのARNのリスト
+# }
 
 #####################################################################################
 # S3
