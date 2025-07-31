@@ -1,0 +1,192 @@
+openapi: 3.0.1
+info:
+  title: LLM Service API
+  version: "0.1.0"
+  description: LLM Run registration and status retrieval API.
+  security: []
+
+x-amazon-apigateway-endpoint-configuration:
+  types:
+    - PRIVATE
+  vpcEndpointIds:
+     - ${vpce_id}
+
+servers:
+  - url: https://{api_id}.execute-api.${region}.amazonaws.com/${stage}
+
+tags:
+  - name: Runs
+    description: Run registration and status retrieval
+
+paths:
+  /llm-service/runs:
+    post:
+      security: []
+      tags: [Runs]
+      summary: Register a new Run
+      operationId: registerRun
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LLMServiceRegisterRunRequest'
+      responses:
+        '201':
+          description: Run registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LLMServiceRegisterRunResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${lambda_invoke_arn}/invocations
+
+    get:
+      security: []
+      tags: [Runs]
+      summary: List Run statuses
+      operationId: listRuns
+      parameters:
+        - in: query
+          name: job_id
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Optional filter by Job ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LLMServiceGetJobStatusResponse'
+        '500':
+          description: Server error
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${lambda_invoke_arn}/invocations
+        passthroughBehavior: when_no_match
+        contentHandling: CONVERT_TO_TEXT
+
+  /llm-service/runs/{run_id}:
+    get:
+      security: []
+      tags: [Runs]
+      summary: Get a Run status
+      operationId: getRunStatus
+      parameters:
+        - in: path
+          name: run_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Run ID
+        - in: query
+          name: job_id
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Optional Job ID for consistency check
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LLMServiceGetJobStatusResponse'
+        '404':
+          description: Not found
+        '500':
+          description: Server error
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${lambda_invoke_arn}/invocations
+        passthroughBehavior: when_no_match
+        contentHandling: CONVERT_TO_TEXT
+
+components:
+  schemas:
+    UUID:
+      type: string
+      format: uuid
+
+    LLMServiceRunStatus:
+      type: string
+      description: Run status (e.g., queued, running, succeeded, failed, etc.)
+
+    HogeObject:
+      type: object
+      additionalProperties: true
+      description: Arbitrary LLM request object
+
+    HogeObjectReference:
+      type: object
+      additionalProperties: true
+      description: Reference/location where the result should be stored
+
+    LLMServiceRegisterRunRequest:
+      type: object
+      required: [job_id, run_id, request_object]
+      properties:
+        job_id:
+          $ref: '#/components/schemas/UUID'
+          description: Job ID
+        run_id:
+          $ref: '#/components/schemas/UUID'
+          description: Job Run ID
+        request_object:
+          $ref: '#/components/schemas/HogeObject'
+          description: Request object containing LLM task requests
+        result_reference:
+          $ref: '#/components/schemas/HogeObjectReference'
+          nullable: true
+          description: Result storage reference
+        callback_url:
+          type: string
+          format: uri
+          nullable: true
+          description: Callback URL for status updates
+
+    LLMServiceRegisterRunResponse:
+      type: object
+      required: [job_id, run_id, status]
+      properties:
+        job_id:
+          $ref: '#/components/schemas/UUID'
+        run_id:
+          $ref: '#/components/schemas/UUID'
+        status:
+          $ref: '#/components/schemas/LLMServiceRunStatus'
+
+    LLMServiceGetRunStatusRequest:
+      type: object
+      required: [job_id, run_id]
+      properties:
+        job_id:
+          $ref: '#/components/schemas/UUID'
+        run_id:
+          $ref: '#/components/schemas/UUID'
+
+    LLMServiceGetJobStatusResponse:
+      type: object
+      required: [job_id, run_id, status]
+      properties:
+        job_id:
+          $ref: '#/components/schemas/UUID'
+        run_id:
+          $ref: '#/components/schemas/UUID'
+        status:
+          $ref: '#/components/schemas/LLMServiceRunStatus'
