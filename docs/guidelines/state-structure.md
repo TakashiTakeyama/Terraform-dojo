@@ -34,7 +34,7 @@ terraform-dojo/
 ```
 
 各 stack ディレクトリをルートモジュールとし、`modules/` の再利用モジュールを呼び出す。
-環境差分は `terraform/env/<env>/<stack>/terraform.tfvars` で管理する。
+環境差分はディレクトリで管理し、必要な場合のみ `-var` で上書きする。
 作成時は `terraform/env/_templates/stack-template.md` をテンプレートとして使う。
 
 ## 3. stack の責務例
@@ -43,6 +43,22 @@ terraform-dojo/
 - `public-api`: 外部連携 API
 - `analytics`: 観測/分析系サービス
 - `batch-processor-*`: 頻繁なコード更新を想定した分割スタック
+
+### 3.1 `base` と `core-service` の責務境界
+
+- `base`:
+  - 複数サービスで共有される基盤を管理する
+  - 変更頻度は低いが、変更時の影響範囲は広い
+  - 代表例: 共通ネットワーク、共通 IAM、共通 KMS
+
+- `core-service`:
+  - 特定サービスの実行に必要なリソースを管理する
+  - 変更頻度は高めで、影響範囲はサービス内に限定される
+  - 代表例: サービス用 ECS/Lambda/API Gateway
+
+- 分割ルール:
+  - 2つ以上のサービスから参照されるなら `base`
+  - 単一サービスで閉じるなら `core-service`
 
 ## 4. backend key の命名規則
 
@@ -83,6 +99,6 @@ project/<env>/<stack>/terraform.tfstate
 ```bash
 cd terraform/env/stg/batch-worker-service
 terraform init
-terraform plan -var-file="terraform.tfvars"
-terraform apply -var-file="terraform.tfvars"
+terraform plan
+terraform apply
 ```

@@ -37,7 +37,8 @@
 
 ### 3.2 tfvars の扱い
 
-- 環境別設定は `-var-file` で明示的に読み込む
+- ルートモジュールでは、環境差分をディレクトリ構成で表現する
+- `tfvars` は常用せず、必要な場合のみ `-var` / `-var-file` を明示的に使う
 - 予期しない自動読込を避けるため、`.auto.tfvars` の常用は避ける
 - 機密値を tfvars にコミットしない
 
@@ -101,7 +102,7 @@ PR 作成前に最低限、以下を実施すること:
 ```bash
 terraform fmt -recursive
 terraform validate
-terraform plan -var-file="<env>.tfvars"
+terraform plan
 ```
 
 必要に応じて `tflint` や `tfsec` も実施する。

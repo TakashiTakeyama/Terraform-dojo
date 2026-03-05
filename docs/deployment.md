@@ -45,7 +45,7 @@ terraform init
 ### 2. 実行計画の確認
 
 ```bash
-terraform plan -var-file="環境名.tfvars"
+terraform plan
 ```
 
 変更内容を確認し、予期しない変更がないことを確認してください。
@@ -53,7 +53,7 @@ terraform plan -var-file="環境名.tfvars"
 ### 3. リソースの適用
 
 ```bash
-terraform apply -var-file="環境名.tfvars"
+terraform apply
 ```
 
 変更内容を確認して「yes」と入力すると、リソースが作成されます。
@@ -63,16 +63,13 @@ terraform apply -var-file="環境名.tfvars"
 環境を削除する場合は以下のコマンドを実行します：
 
 ```bash
-terraform destroy -var-file="環境名.tfvars"
+terraform destroy
 ```
 
 ## 複数環境の管理
 
-異なる環境（開発、ステージング、本番など）を管理するには、環境ごとに異なる`.tfvars`ファイルを作成します：
-
-- `dev.tfvars` - 開発環境用
-- `stg.tfvars` - ステージング環境用
-- `prod.tfvars` - 本番環境用
+環境差分はディレクトリ（`terraform/env/dev`, `terraform/env/stg`, `terraform/env/prod`）で管理します。  
+必要に応じて `-var` で明示的に上書きしてください。
 
 ## State の分割戦略
 
@@ -113,6 +110,12 @@ terraform/
 各ディレクトリが 1 つの state を持つルートモジュールです。  
 例えば `stg` の Worker Service だけを変更したい場合は `terraform/env/stg/batch-worker-service` で `plan/apply` します。
 雛形は `terraform/env/` 配下に作成済みです。
+
+## `base` と `core-service` の使い分け
+
+- `base`: 複数サービスで共有される基盤リソースを管理
+- `core-service`: 個別サービス実行に必要なリソースを管理
+- 共通利用されるかどうかを境界判断の第一基準にする
 
 ## Terraform ワークスペースの使用
 

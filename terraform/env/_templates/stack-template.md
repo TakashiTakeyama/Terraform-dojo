@@ -7,4 +7,4 @@
 - `versions.tf`: Terraform / Provider バージョン
 - `main.tf`: モジュール呼び出し
 - `variables.tf`: 変数定義
-- `terraform.tfvars`: 環境固有値
+- `outputs.tf`: 必要な出力
