@@ -34,9 +34,9 @@ locals {
         "common/batch_status.py",
       ]
       environment_variables = {
-        DYNAMODB_TABLE_NAME   = aws_dynamodb_table.llm_batch_table.name                                                                                     # DynamoDBテーブル名
-        SQS_QUEUE_URL         = aws_sqs_queue.llm_batch_queue.url                                                                                           # SQSキューURL
-        ANTHROPIC_SECRET_NAME = data.aws_secretsmanager_secret_version.anthropic_api_key.secret_string                                                      # Anthropic APIキー
+        DYNAMODB_TABLE_NAME   = aws_dynamodb_table.llm_batch_table.name                                                                           # DynamoDBテーブル名
+        SQS_QUEUE_URL         = aws_sqs_queue.llm_batch_queue.url                                                                                 # SQSキューURL
+        ANTHROPIC_SECRET_NAME = data.aws_secretsmanager_secret_version.anthropic_api_key.secret_string                                            # Anthropic APIキー
         ALLOWED_ORIGINS       = var.environment_name == "production" ? "https://app.hoge.com" : "https://localhost:3000,https://staging.hoge.com" # CORS許可
       }
     }

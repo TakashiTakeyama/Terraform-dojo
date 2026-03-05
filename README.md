@@ -7,6 +7,11 @@ AWS リソースの module を管理
 Terraform の実装・レビュー時は、以下のガイドラインを参照してください。  
 [Terraform コーディング規約](docs/guidelines/terraform-coding-guideline.md)
 
+## 環境スタック
+
+環境別・stack別のルートモジュール運用は以下を参照してください。  
+[Environment Stacks](terraform/env/README.md)
+
 ## 前提条件
 
 - Terraform v1.9.5 以上
@@ -35,6 +40,10 @@ terraform-dojo/
 │   ├── test/         # テスト用モジュール
 │   ├── tgw/          # Transit Gateway用モジュール
 │   └── vpc/          # VPC設定用モジュール
+├── terraform/env/    # 環境別のルートモジュール（state分割）
+│   ├── dev/
+│   ├── stg/
+│   └── prod/
 ├── .terraform.lock.hcl # Terraformロックファイル
 └── .gitignore        # Gitの除外ファイル設定
 ```

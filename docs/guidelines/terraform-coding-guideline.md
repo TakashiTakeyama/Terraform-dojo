@@ -1,7 +1,6 @@
 # Terraform コーディング規約
 
-このドキュメントは、`Terraform-dojo` で Terraform コードを追加・修正する際の基準を定義します。  
-`aicentral-voice-infrastructure` の規約を参考にしつつ、`Terraform-dojo` の運用に合わせて調整しています。
+このドキュメントは、`Terraform-dojo` で Terraform コードを追加・修正する際の基準を定義します。
 
 ## 1. 基本方針
 
@@ -74,7 +73,7 @@
 
 ### 7.1 推奨する分割単位
 
-- まずは `environment × stack`（例: `dev/network`, `prod/security`）で分割する
+- まずは `environment × service-stack`（例: `dev/core-service`, `stg/batch-worker-service`）で分割する
 - 更新頻度が明らかに異なるものは stack を分離する
 - 破壊的変更の影響範囲が大きいもの（VPC、DB など）は独立 state を推奨する
 
@@ -90,7 +89,7 @@
 ### 7.3 命名とキー設計
 
 - backend key は `project/<env>/<stack>/terraform.tfstate` の形式を推奨する
-- stack 名は責務ベースで命名する（`network`, `identity`, `data`, `app` など）
+- stack 名は用途が分かる中立的な命名にする（`base`, `core-service`, `batch-worker-service` など）
 - 命名は長期運用前提で固定し、途中で頻繁に変更しない
 
 詳細は `State 分割ガイド`（`docs/guidelines/state-structure.md`）を参照する。

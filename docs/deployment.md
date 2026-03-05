@@ -76,9 +76,43 @@ terraform destroy -var-file="環境名.tfvars"
 
 ## State の分割戦略
 
-- 基本は `environment × stack`（例: `dev/network`, `prod/app`）で管理します
+- 基本は `environment × service-stack`（例: `dev/core-service`, `prod/public-api`）で管理します
 - stack ごとに独立したルートモジュール（backend 設定付き）を作成します
 - 詳細ルールは [State 分割ガイド](guidelines/state-structure.md) を参照してください
+
+## 推奨ディレクトリ構成（dev/stg/prod）
+
+```text
+terraform/
+  env/
+    dev/
+      base/
+      core-service/
+      public-api/
+      analytics/
+      scheduled-tasks/
+    stg/
+      base/
+      core-service/
+      public-api/
+      batch-worker-infra/
+      batch-worker-service/
+      batch-worker-task/
+      batch-worker-pipeline/
+    prod/
+      base/
+      core-service/
+      public-api/
+      analytics/
+      scheduled-tasks/
+      batch-processor-base/
+      batch-processor-runtime/
+      batch-processor-pipeline/
+```
+
+各ディレクトリが 1 つの state を持つルートモジュールです。  
+例えば `stg` の Worker Service だけを変更したい場合は `terraform/env/stg/batch-worker-service` で `plan/apply` します。
+雛形は `terraform/env/` 配下に作成済みです。
 
 ## Terraform ワークスペースの使用
 

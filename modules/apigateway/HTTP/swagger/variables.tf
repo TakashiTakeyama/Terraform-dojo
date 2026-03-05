@@ -1,6 +1,6 @@
 variable "company_name" {
   type        = string
-  description = "会社名"
+  description = "組織名"
 }
 
 variable "env" {
