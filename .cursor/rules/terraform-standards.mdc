@@ -1,0 +1,15 @@
+---
+description: Terraform-dojo の Terraform 実装規約
+globs: "**/*.tf"
+alwaysApply: false
+---
+
+# Terraform 実装規約
+
+- 変更前提: `plan` 差分の予測可能性を優先し、過剰な抽象化を避ける
+- 変数定義: `type` と `description` を必須化し、必要に応じて `validation` を付ける
+- 命名: Terraform 識別子は `snake_case` を使う
+- セキュリティ: 機密情報をコードへ直書きしない。IAM は最小権限を徹底する
+- 依存: state 間の密結合を避け、`data` ソース活用を優先する
+
+詳細は `docs/guidelines/terraform-coding-guideline.md` を参照する。

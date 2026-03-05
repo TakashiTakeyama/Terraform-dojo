@@ -2,6 +2,11 @@
 
 AWS リソースの module を管理
 
+## コーディング規約
+
+Terraform の実装・レビュー時は、以下のガイドラインを参照してください。  
+[Terraform コーディング規約](docs/guidelines/terraform-coding-guideline.md)
+
 ## 前提条件
 
 - Terraform v1.9.5 以上

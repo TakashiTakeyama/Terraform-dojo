@@ -74,6 +74,12 @@ terraform destroy -var-file="環境名.tfvars"
 - `stg.tfvars` - ステージング環境用
 - `prod.tfvars` - 本番環境用
 
+## State の分割戦略
+
+- 基本は `environment × stack`（例: `dev/network`, `prod/app`）で管理します
+- stack ごとに独立したルートモジュール（backend 設定付き）を作成します
+- 詳細ルールは [State 分割ガイド](guidelines/state-structure.md) を参照してください
+
 ## Terraform ワークスペースの使用
 
 複数の環境を管理するもう一つの方法は、Terraform ワークスペースを使用することです：

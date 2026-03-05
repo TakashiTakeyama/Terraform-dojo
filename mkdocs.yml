@@ -21,6 +21,10 @@ markdown_extensions:
 nav:
   - ホーム: index.md
   - プロジェクト概要: overview.md
+  - ガイドライン:
+      - 概要: guidelines/index.md
+      - Terraform コーディング規約: guidelines/terraform-coding-guideline.md
+      - State 分割ガイド: guidelines/state-structure.md
   - モジュール:
       - 概要: modules/index.md
   - 変数一覧: variables.md
