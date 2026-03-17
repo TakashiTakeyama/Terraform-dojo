@@ -2,6 +2,8 @@
 
 このドキュメントは、Terraform state をどの単位で分割するかを決めるための実践ガイドです。
 
+Terraform プロジェクト全体のディレクトリ設計や、`base` / `service` / `pipeline` などの stack 構成から考えたい場合は、先に `terraform-structure-design-guide.md` を参照してください。
+
 ## 1. 基本方針
 
 - 分割単位は `environment × service-stack` を基本とする
@@ -15,6 +17,7 @@
 terraform-dojo/
   modules/                        # 再利用モジュール（stateを持たない）
   terraform/
+    usecases/                     # stack の実体
     env/
       dev/
         base/
@@ -33,7 +36,8 @@ terraform-dojo/
         ...
 ```
 
-各 stack ディレクトリをルートモジュールとし、`modules/` の再利用モジュールを呼び出す。
+各 stack ディレクトリを root module とし、基本的には対応する `terraform/usecases/` を呼び出す。
+`usecases` は必要に応じて `modules/` の再利用モジュールを呼び出す。
 環境差分はディレクトリで管理し、必要な場合のみ `-var` で上書きする。
 作成時は `terraform/env/_templates/stack-template.md` をテンプレートとして使う。
 

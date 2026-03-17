@@ -2,14 +2,27 @@
 
 AWS リソースのモジュールを管理するためのプロジェクトです。
 
-## コーディング規約
+## 読み方
 
 Terraform 実装時の基準は [コーディングガイドライン](guidelines/index.md) を参照してください。
 
+- 新しく Terraform 構成を考える: [Terraform 構成設計ガイド](guidelines/terraform-structure-design-guide.md) -> [State 分割ガイド](guidelines/state-structure.md) -> [Terraform コーディング規約](guidelines/terraform-coding-guideline.md)
+- 既存 stack を追加・修正する: [Terraform コーディング規約](guidelines/terraform-coding-guideline.md) -> [Environment Stacks](../terraform/env/README.md)
+- モジュールを追加・修正する: [モジュール設計ガイド](guidelines/module-design-guideline.md) -> [Terraform コーディング規約](guidelines/terraform-coding-guideline.md)
+- レビューする: [Terraform レビューチェックリスト](guidelines/review-checklist.md)
+
+## ガイド一覧
+
+- [Terraform 構成設計ガイド](guidelines/terraform-structure-design-guide.md)
+- [Terraform コーディング規約](guidelines/terraform-coding-guideline.md)
+- [モジュール設計ガイド](guidelines/module-design-guideline.md)
+- [State 分割ガイド](guidelines/state-structure.md)
+- [Terraform レビューチェックリスト](guidelines/review-checklist.md)
+
 ## 概要
 
-このプロジェクトは、AWS リソースを効率的に管理するための再利用可能な Terraform モジュールのコレクションです。
-各モジュールは、特定の AWS サービスに特化しており、一貫した方法でリソースをプロビジョニングできます。
+このプロジェクトは、再利用可能な Terraform モジュールと、環境ごとの root module を管理するためのリポジトリです。
+基本構成は `env -> usecases -> modules` です。
 
 ## 前提条件
 
@@ -18,34 +31,25 @@ Terraform 実装時の基準は [コーディングガイドライン](guideline
 
 ## 使い方
 
+各 stack ディレクトリに移動して実行します。
+
 ```bash
-# 初期化
+cd terraform/env/dev/core-service
 terraform init
-
-# 実行計画の確認
 terraform plan
-
-# リソースの適用
 terraform apply
-
-# リソースの破棄
-terraform destroy
 ```
+
+詳細は [Environment Stacks](../terraform/env/README.md) を参照してください。
 
 ## プロジェクト構造
 
 ```
 terraform-dojo/
-├── main.tf           # メインのTerraformコード
-├── variables.tf      # 変数定義
-├── providers.tf      # プロバイダー設定
-├── versions.tf       # Terraformとプロバイダーのバージョン要件
-├── locals.tf         # ローカル変数
-├── modules/          # 再利用可能なモジュール
-    ├── apigateway/   # API Gateway用モジュール
-    ├── aurora/       # Amazon Auroraデータベース用モジュール
-    ├── cloudfront/   # CloudFrontディストリビューション用モジュール
-    └── ...           # その他のモジュール
+├── modules/                  # 再利用可能モジュール
+└── terraform/
+    ├── usecases/            # stack の実体
+    └── env/                 # 環境別の root module
 ```
 
-各モジュールの詳細については、[モジュール概要](modules/index.md)を参照してください。
+各モジュールの詳細については、[モジュール概要](modules/index.md) を参照してください。

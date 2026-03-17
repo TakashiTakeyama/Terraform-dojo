@@ -21,6 +21,9 @@ crash.log
 *.pem
 *.key
 
+# 業務コード（publicリポジトリから除外）
+modules/llm-service/llm-batch/
+
 # ログファイル
 *.log
 crash.*.log
