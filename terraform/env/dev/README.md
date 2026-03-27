@@ -18,6 +18,19 @@
 - `batch-processor-runtime`
 - `batch-processor-pipeline`
 
+## CodePipeline サンプル（`modules/codepipeline` 呼び出し）
+
+実プロジェクトと同じ **`terraform/env/dev/<stack>/`** 配置。値は各 stack の **`locals.tf`**（tfvars 不使用）。
+
+| スタック | 型 | モジュール |
+|----------|----|------------|
+| [`build-only/`](./build-only/) | A | `github-buildchain` |
+| [`lambda-pipeline/`](./lambda-pipeline/) | B・Lambda | `pipeline-app-lambda` |
+| [`ecs-pipeline/`](./ecs-pipeline/) | B・ECS | `pipeline-app-ecs` |
+| [`infra-pipeline/`](./infra-pipeline/) | C | `pipeline-infra-tf` |
+
+方針: [codepipeline-standard-policy.md](../../../docs/guidelines/codepipeline-standard-policy.md)
+
 ## 追加済みサンプル
 
 - `base/`: 基盤スタックの最小サンプル

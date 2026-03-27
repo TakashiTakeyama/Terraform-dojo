@@ -42,6 +42,10 @@
 - backend key は `project/<env>/<stack>/terraform.tfstate` を採用する
 - stack 間参照は原則 `data` ソースを優先し、密結合を避ける
 
+## CodePipeline（参考実装）
+
+[`dev/`](./dev/README.md) に `build-only` / `lambda-pipeline` / `ecs-pipeline` / `infra-pipeline` あり。本番は [`prod/`](./prod/README.md) に同構成で配置する。
+
 ## テンプレート
 
 - 構成一覧: `_templates/stack-template.md`
