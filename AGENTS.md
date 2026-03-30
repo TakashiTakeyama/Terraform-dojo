@@ -83,7 +83,8 @@ terraform-dojo/
 ### 命名
 
 - Terraform 識別子は `snake_case`
-- AWS リソース名や `Name` タグは環境・用途が識別できる命名にする
+- AWS リソース名は `${stage}-${project}-descriptor` パターンに従う
+- 文字数制限のあるリソース（Target Group 等）ではプロジェクト名を略称にする
 - リポジトリ全体で命名規則を統一する
 
 ### ファイル分割
@@ -94,15 +95,18 @@ terraform-dojo/
 ### セキュリティ
 
 - 機密情報をコードに書かない
-- シークレットは Secrets Manager を使う
+- シークレットは Secrets Manager で器のみ作成する（`secret_version` は定義しない）
+- シークレット命名は `{env}/{service}` または `{env}/shared` パターンに従う
 - IAM は最小権限。`*` は必要最小限
 - IAM JSON は `aws_iam_policy_document` を使う
 - Security Group は必要な宛先・ポートに絞る。全開放には理由を残す
+- Security Group の相互参照は `ingress_rule` / `egress_rule` リソースで循環参照を回避する
 
 ### バージョン管理
 
-- root module: 本番では厳密に固定する
-- reusable module: 下限指定を基本とする
+- root module: Terraform / Provider バージョンを完全固定する（例: `"1.11.0"`, `"5.80.0"`）
+- reusable module: `>=` で下限指定する（例: `">= 1.11.0"`）
+- `.terraform-version` ファイルで Terraform バージョンを固定する
 
 ### 依存関係
 
@@ -113,6 +117,12 @@ terraform-dojo/
 
 - 内容を理解できる場合に限って採用する
 - バージョンを明示的に固定し、理由を残す
+- 例外として `terraform-aws-modules/vpc/aws` は許容する
+
+### ECS パターン
+
+- Auto Scaling 使用時は `lifecycle { ignore_changes = [desired_count] }` を付ける
+- ヘルスチェックの `matcher` は具体的なステータスコードを指定する（`"200-399"` は非推奨）
 
 ## やってはいけないこと
 
@@ -150,4 +160,5 @@ terraform plan
 - `docs/guidelines/terraform-coding-guideline.md` — コーディング規約
 - `docs/guidelines/module-design-guideline.md` — モジュール設計
 - `docs/guidelines/state-structure.md` — State 分割
+- `docs/guidelines/secrets-management-guideline.md` — シークレット管理
 - `docs/guidelines/review-checklist.md` — レビューチェックリスト
