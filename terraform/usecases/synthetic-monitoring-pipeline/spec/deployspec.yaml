@@ -1,0 +1,26 @@
+# Canary deploy buildspec
+#
+# S3 にアップロードされた canary zip の version_id 変更を
+# terraform apply で Canary リソースに反映する。
+#
+# このスペックはパイプラインの Deploy ステージで実行される。
+# Build ステージ（zip + S3 アップロード）完了後に実行される。
+
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - set -evx
+
+      - TENV_VERSION="v4.7.21"
+      - TENV_ARCHIVE="tenv_$${TENV_VERSION}_Linux_arm64.tar.gz"
+      - curl -s --retry 3 -O -L "https://github.com/tofuutils/tenv/releases/download/$${TENV_VERSION}/$${TENV_ARCHIVE}"
+      - tar xvzf $${TENV_ARCHIVE} -C /usr/local/bin
+
+  build:
+    commands:
+      - cd $CODEBUILD_SRC_DIR/${ROOT_MODULE_PATH}
+      - tenv tf install
+      - terraform init -input=false
+      - terraform apply -auto-approve -input=false

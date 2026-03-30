@@ -1,0 +1,27 @@
+# Canary code build buildspec
+#
+# canary-code/ 配下の各シナリオを zip 化して S3 にアップロードする。
+# Canary リソースの更新（terraform apply）は後続の Deploy ステージが担当する。
+#
+# Environment variables (injected by CodeBuild):
+#   CANARY_S3_BUCKET - zip のアップロード先 S3 バケット
+
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - set -evx
+      - cd $CODEBUILD_SRC_DIR/${CANARY_CODE_BASE_PATH}
+
+      # web-scenario を zip 化して S3 にアップロード
+      - cd web-scenario
+      - zip -r /tmp/web-scenario.zip .
+      - aws s3 cp /tmp/web-scenario.zip "s3://$${CANARY_S3_BUCKET}/web-scenario/canary.zip"
+      - cd ..
+
+      # api-scenario を zip 化して S3 にアップロード
+      - cd api-scenario
+      - zip -r /tmp/api-scenario.zip .
+      - aws s3 cp /tmp/api-scenario.zip "s3://$${CANARY_S3_BUCKET}/api-scenario/canary.zip"
+      - cd ..

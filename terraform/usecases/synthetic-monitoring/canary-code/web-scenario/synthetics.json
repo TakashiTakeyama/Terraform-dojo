@@ -1,0 +1,12 @@
+{
+  "step": {
+    "screenshotOnStepStart": false,
+    "screenshotOnStepSuccess": true,
+    "screenshotOnStepFailure": true,
+    "continueOnStepFailure": false
+  },
+  "logging": {
+    "logRequest": false,
+    "logResponse": false
+  }
+}
