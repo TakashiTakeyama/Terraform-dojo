@@ -136,4 +136,4 @@ terraform apply
 
 GitHub Actions や AWS CodePipeline などの CI/CD ツールと Terraform を統合することで、インフラストラクチャの変更を自動化できます。
 
-詳細な設定例については、[GitHub Actions 設定例](https://github.com/yourusername/terraform-dojo/examples/github-actions)を参照してください。
+チームでの開発からリリースまでの一連のフロー（ブランチ戦略、PR ベースの plan/apply、Dev → Prod 段階デプロイ、安全策）については [Terraform リリースフローガイド](guidelines/terraform-release-flow.md) を参照してください。
