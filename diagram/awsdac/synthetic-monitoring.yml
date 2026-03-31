@@ -1,0 +1,267 @@
+Diagram:
+  DefinitionFiles:
+    - Type: LocalFile
+      LocalFile: diagram/definitions/definition-for-aws-icons-light.yaml
+
+  Resources:
+    Canvas:
+      Type: AWS::Diagram::Canvas
+      Direction: horizontal
+      Children:
+        - LeftStack
+        - AWSCloud
+        - ExternalMonitoring
+
+    ExternalMonitoring:
+      Type: AWS::Diagram::Resource
+      Title: "External Monitoring\n(optional)"
+      Preset: "Generic group"
+
+    LeftStack:
+      Type: AWS::Diagram::VerticalStack
+      Children:
+        - DeployTriggerGroup
+        - ExecutionTriggerGroup
+
+    DeployTriggerGroup:
+      Type: AWS::Diagram::Resource
+      Title: "Deploy Trigger"
+      Preset: "Generic group"
+      Direction: vertical
+      Children:
+        - GitHub
+
+    GitHub:
+      Type: AWS::Diagram::Resource
+      Title: "Source Repository\ncanary code push"
+      Preset: "Generic group"
+
+    ExecutionTriggerGroup:
+      Type: AWS::Diagram::Resource
+      Title: "Execution Trigger"
+      Preset: "Generic group"
+      Direction: vertical
+      Children:
+        - ReleasePipeline
+        - Operator
+
+    ReleasePipeline:
+      Type: AWS::Diagram::Resource
+      Title: "CodePipeline\n(Release Trigger)"
+      Preset: "AWS CodePipeline"
+
+    Operator:
+      Type: AWS::Diagram::Resource
+      Title: "Operator\n(On-demand)"
+      Preset: "Authenticated user"
+
+    AWSCloud:
+      Type: AWS::Diagram::Cloud
+      Direction: vertical
+      Preset: AWSCloudNoLogo
+      Align: center
+      Children:
+        - DeployPipelineStack
+        - S3Stack
+        - CanaryLogsStack
+        - Spacer
+        - TargetStack
+
+    # --- synthetics-pipeline (CodePipeline + CodeBuild → S3 → Canary) ---
+
+    DeployPipelineStack:
+      Type: AWS::Diagram::HorizontalStack
+      Children:
+        - SyntheticsCodePipeline
+
+    SyntheticsCodePipeline:
+      Type: AWS::Diagram::Resource
+      Title: "CodePipeline\n(synthetics-pipeline)"
+      Preset: "AWS CodePipeline"
+      Direction: horizontal
+      Children:
+        - PipelineBuild
+
+    PipelineBuild:
+      Type: AWS::Diagram::Resource
+      Title: "CodeBuild\n(zip + S3 + update-canary)"
+      Preset: "AWS CodeBuild"
+
+    # --- S3 Buckets ---
+
+    Spacer:
+      Type: AWS::Diagram::HorizontalStack
+      Children: []
+
+    S3Stack:
+      Type: AWS::Diagram::HorizontalStack
+      Children:
+        - S3Deployments
+        - S3Artifacts
+
+    S3Deployments:
+      Type: AWS::S3::Bucket
+      Title: "S3\nCanary Code (zip)"
+      Preset: "S3 Standard"
+
+    S3Artifacts:
+      Type: AWS::S3::Bucket
+      Title: "S3\nScreenshots / Logs"
+      Preset: "S3 Standard"
+
+    # --- Canary & Logs ---
+
+    CanaryLogsStack:
+      Type: AWS::Diagram::HorizontalStack
+      Children:
+        - CanaryGroup
+        - CloudWatchLogs
+        - LogForwarder
+
+    CanaryGroup:
+      Type: AWS::Diagram::Resource
+      Title: "Canary"
+      Preset: "Generic group"
+      Direction: horizontal
+      Children:
+        - BrowserCanary
+        - APICanary
+
+    BrowserCanary:
+      Type: AWS::Synthetics
+      Title: "Synthetics Canary\n(Browser)"
+      Preset: "Synthetics"
+
+    APICanary:
+      Type: AWS::Synthetics
+      Title: "Synthetics Canary\n(API)"
+      Preset: "Synthetics"
+
+    CloudWatchLogs:
+      Type: AWS::CloudWatch
+      Title: "CloudWatch Logs"
+      Preset: "Amazon CloudWatch"
+
+    LogForwarder:
+      Type: AWS::Lambda::Function
+      Title: "Log Forwarder\n(Lambda, optional)"
+      Preset: "Lambda"
+
+    # --- Monitoring Targets ---
+
+    TargetStack:
+      Type: AWS::Diagram::HorizontalStack
+      Children:
+        - WebApplication
+        - APIService
+
+    WebApplication:
+      Type: AWS::Diagram::Resource
+      Title: "Web Application"
+      Preset: "AWS Fargate"
+
+    APIService:
+      Type: AWS::Diagram::Resource
+      Title: "API Service"
+      Preset: "AWS Fargate"
+
+  Links:
+    # === synthetics-pipeline flow (CodePipeline: canary code) ===
+
+    # GitHub -> CodePipeline (canary-code/ push triggers deploy)
+    - Source: DeployTriggerGroup
+      SourcePosition: E
+      Target: SyntheticsCodePipeline
+      TargetPosition: W
+      Type: orthogonal
+      TargetArrowHead:
+        Type: Default
+
+    # Build -> S3 Deployments (zip upload)
+    - Source: SyntheticsCodePipeline
+      SourcePosition: S
+      Target: S3Deployments
+      TargetPosition: N
+      Type: orthogonal
+      TargetArrowHead:
+        Type: Default
+
+    # Canary reads code from S3 Deployments
+    - Source: S3Deployments
+      SourcePosition: S
+      Target: CanaryGroup
+      TargetPosition: N
+      Type: orthogonal
+      TargetArrowHead:
+        Type: Default
+
+    # === Canary execution flow (triggered by release or operator) ===
+
+    # Execution Trigger -> Canary (start after release or on-demand)
+    - Source: ExecutionTriggerGroup
+      SourcePosition: E
+      Target: CanaryGroup
+      TargetPosition: W
+      Type: orthogonal
+      TargetArrowHead:
+        Type: Default
+
+    # Canary -> S3 Artifacts (screenshots, logs)
+    - Source: CanaryGroup
+      SourcePosition: E
+      Target: S3Artifacts
+      TargetPosition: W
+      Type: orthogonal
+      TargetArrowHead:
+        Type: Default
+
+    # Canary -> Targets (Playwright)
+    - Source: CanaryGroup
+      SourcePosition: S
+      Target: WebApplication
+      TargetPosition: N
+      Type: orthogonal
+      TargetArrowHead:
+        Type: Default
+      Labels:
+        SourceRight:
+          Title: "Playwright"
+
+    - Source: CanaryGroup
+      SourcePosition: S
+      Target: APIService
+      TargetPosition: N
+      Type: orthogonal
+      TargetArrowHead:
+        Type: Default
+      Labels:
+        SourceRight:
+          Title: "Playwright"
+
+    # Canary -> CloudWatch Logs -> Log Forwarder -> External Monitoring
+    - Source: CanaryGroup
+      SourcePosition: E
+      Target: CloudWatchLogs
+      TargetPosition: W
+      Type: orthogonal
+      TargetArrowHead:
+        Type: Default
+
+    - Source: CloudWatchLogs
+      SourcePosition: E
+      Target: LogForwarder
+      TargetPosition: W
+      Type: orthogonal
+      TargetArrowHead:
+        Type: Default
+      Labels:
+        TargetRight:
+          Title: "Subscription Filter"
+
+    - Source: LogForwarder
+      SourcePosition: E
+      Target: ExternalMonitoring
+      TargetPosition: W
+      Type: orthogonal
+      TargetArrowHead:
+        Type: Default
