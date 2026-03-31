@@ -1,0 +1,65 @@
+# Reference: AWS 外の S3 互換オブジェクトストレージから DataSync で S3 へ取り込み
+# ログ保管・バックアップ・ベンダー中立の取り込みパターン（具体製品名は図に含めない）。
+Diagram:
+  DefinitionFiles:
+    - Type: LocalFile
+      LocalFile: diagram/definitions/definition-for-aws-icons-light.yaml
+
+  Resources:
+    Canvas:
+      Type: AWS::Diagram::Canvas
+      Direction: horizontal
+      Children:
+        - ExternalStack
+        - AWSCloud
+
+    ExternalStack:
+      Type: AWS::Diagram::VerticalStack
+      Children:
+        - ExternalObjectStorage
+
+    ExternalObjectStorage:
+      Type: AWS::Diagram::Resource
+      Title: "S3-Compatible Object Storage\n(external / other cloud)"
+      Preset: "Generic group"
+
+    AWSCloud:
+      Type: AWS::Diagram::Cloud
+      Direction: horizontal
+      Preset: AWSCloudNoLogo
+      Align: center
+      Children:
+        - IngestFlowStack
+
+    IngestFlowStack:
+      Type: AWS::Diagram::HorizontalStack
+      Children:
+        - DataSyncTask
+        - DestinationS3
+
+    DataSyncTask:
+      Type: AWS::Diagram::Resource
+      Title: "AWS DataSync\n(scheduled task)"
+      Preset: "AWS DataSync"
+
+    DestinationS3:
+      Type: AWS::S3::Bucket
+      Title: "Amazon S3\n(destination)"
+      Preset: "S3 Standard"
+
+  Links:
+    - Source: ExternalObjectStorage
+      SourcePosition: E
+      Target: DataSyncTask
+      TargetPosition: W
+      Type: orthogonal
+      TargetArrowHead:
+        Type: Default
+
+    - Source: DataSyncTask
+      SourcePosition: E
+      Target: DestinationS3
+      TargetPosition: W
+      Type: orthogonal
+      TargetArrowHead:
+        Type: Default

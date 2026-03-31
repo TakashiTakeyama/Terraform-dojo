@@ -1,0 +1,79 @@
+# Reference: 複数 AWS アカウントにまたがる S3 データ連携（スケジュール実行）
+# 中間アカウントで EventBridge + Lambda を置き、パートナー側バケットと自社バケットを同期するパターン。
+Diagram:
+  DefinitionFiles:
+    - Type: LocalFile
+      LocalFile: diagram/definitions/definition-for-aws-icons-light.yaml
+
+  Resources:
+    Canvas:
+      Type: AWS::Diagram::Canvas
+      Direction: horizontal
+      Children:
+        - PartnerAccount
+        - IntegrationAccount
+        - ServiceAccount
+
+    PartnerAccount:
+      Type: AWS::Diagram::Cloud
+      Title: "Partner / Data Source Account"
+      Direction: vertical
+      Children:
+        - PartnerS3
+
+    PartnerS3:
+      Type: AWS::S3::Bucket
+      Title: "Partner S3 Bucket"
+      Preset: "S3 Standard"
+
+    IntegrationAccount:
+      Type: AWS::Diagram::Cloud
+      Title: "Integration (Hub) Account"
+      Direction: vertical
+      Children:
+        - HubEventBridge
+        - HubLambda
+
+    HubEventBridge:
+      Type: AWS::Diagram::Resource
+      Title: "EventBridge\n(Schedule)"
+      Preset: "Amazon EventBridge"
+
+    HubLambda:
+      Type: AWS::Lambda::Function
+      Title: "Lambda\n(Data sync / ETL)"
+      Preset: "Lambda"
+
+    ServiceAccount:
+      Type: AWS::Diagram::Cloud
+      Title: "Service Provider Account"
+      Direction: vertical
+      Children:
+        - ServiceS3
+
+    ServiceS3:
+      Type: AWS::S3::Bucket
+      Title: "Destination S3 Bucket"
+      Preset: "S3 Standard"
+
+  Links:
+    - Source: HubEventBridge
+      SourcePosition: S
+      Target: HubLambda
+      TargetPosition: N
+      TargetArrowHead:
+        Type: Open
+
+    - Source: HubLambda
+      SourcePosition: W
+      Target: PartnerS3
+      TargetPosition: E
+      TargetArrowHead:
+        Type: Open
+
+    - Source: HubLambda
+      SourcePosition: E
+      Target: ServiceS3
+      TargetPosition: W
+      TargetArrowHead:
+        Type: Open

@@ -210,7 +210,7 @@ codebuild_stages = [
 | 制限 | 回避策 |
 |------|--------|
 | **環境変数は PLAINTEXT のみ**。`codebuild_stages[].environment_variables` は `map(string)` で `type = "PLAINTEXT"` 固定。`PARAMETER_STORE` / `SECRETS_MANAGER` を使いたい場合はこのモジュールでは対応できない | buildspec 内で `aws ssm get-parameter` / `aws secretsmanager get-secret-value` を呼ぶか、`environment_variables` の型を `map(object({ value = string, type = optional(string, "PLAINTEXT") }))` に拡張する |
-| **1 ステージ = 1 アクション（並列実行非対応）**。参考実装（aicv-pipeline）では同一ステージ内で複数 Action を `run_order` で並列実行しているが、本モジュールは 1 ステージ 1 Action に固定 | 独立して並列化できるビルド・差分確認などは別ステージに分割するか、モジュールを拡張する |
+| **1 ステージ = 1 アクション（並列実行非対応）**。別プロジェクトのパイプラインでは同一ステージ内で複数 Action を `run_order` で並列実行している例もあるが、本モジュールは 1 ステージ 1 Action に固定 | 独立して並列化できるビルド・差分確認などは別ステージに分割するか、モジュールを拡張する |
 | **`before_entry` 条件スキップ非対応**。差分なし時の早期終了など、参考実装の条件付きステージスキップは実装していない | buildspec 内で `aws codepipeline stop-pipeline-execution` を呼ぶか、Lambda / EventBridge で制御する |
 
 ---

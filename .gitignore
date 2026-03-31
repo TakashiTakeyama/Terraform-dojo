@@ -1,3 +1,6 @@
+# Examples: archive_file 出力（Lambda zip）
+terraform/examples/**/*.zip
+
 # Terraform関連
 .terraform/
 *.tfstate
