@@ -22,6 +22,7 @@ nav:
   - ホーム: index.md
   - プロジェクト概要: overview.md
   - アーキテクチャ:
+      - AWS アプリケーション基盤の選定基準: architecture/aws-application-platform-decision-guide.md
       - AWS Web 配信・SSR の考え方: architecture/aws-web-hosting-decision-guide.md
   - ガイドライン:
       - 概要: guidelines/index.md

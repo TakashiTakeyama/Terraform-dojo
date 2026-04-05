@@ -1,5 +1,7 @@
 # AWS 上の Web 配信・SSR の考え方
 
+全体の実行基盤（Lambda / ECS / App Runner など）の選び方は [AWS アプリケーション基盤の選定基準](aws-application-platform-decision-guide.md) を先に参照してください。
+
 静的サイトや SPA なら **S3 + CloudFront**。Next.js などで SSR が必要なら **Amplify Hosting** か **ECS/Fargate**。CDN の手前で軽い処理だけなら **CloudFront Functions** か **Lambda@Edge**。大規模で役割分離や自由度が重要なら **CloudFront + 別の実行基盤（ECS/Fargate など）**、という整理がわかりやすいです。
 
 ---
