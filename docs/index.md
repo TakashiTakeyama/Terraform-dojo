@@ -13,6 +13,7 @@ Terraform 実装時の基準は [コーディングガイドライン](guideline
 
 ## ガイド一覧
 
+- [AWS Web 配信・SSR の考え方](architecture/aws-web-hosting-decision-guide.md)
 - [Terraform 構成設計ガイド](guidelines/terraform-structure-design-guide.md)
 - [Terraform コーディング規約](guidelines/terraform-coding-guideline.md)
 - [モジュール設計ガイド](guidelines/module-design-guideline.md)

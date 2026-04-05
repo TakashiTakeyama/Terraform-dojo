@@ -21,6 +21,8 @@ markdown_extensions:
 nav:
   - ホーム: index.md
   - プロジェクト概要: overview.md
+  - アーキテクチャ:
+      - AWS Web 配信・SSR の考え方: architecture/aws-web-hosting-decision-guide.md
   - ガイドライン:
       - 概要: guidelines/index.md
       - Terraform コーディング規約: guidelines/terraform-coding-guideline.md
